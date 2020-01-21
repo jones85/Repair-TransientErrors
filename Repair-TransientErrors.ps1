@@ -32,6 +32,7 @@ function Repair-TransientErrors {
                 }
             }
             else {
+                break
                 throw 'No disks found with a status of Transient Error.'
             }
 
