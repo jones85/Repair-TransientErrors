@@ -3,7 +3,12 @@ function Repair-TransientErrors {
     .SYNOPSIS
         This function will remove a capacity disk from an active storage pool and clear any data including meta data that can lead to transient errors
     .EXAMPLE
-        Repair-TransientErrors -
+        Repair-TransientErrors -ClearData $true
+
+        In this example, any disks with a ststus of 'Transient Error' will be removed from the S2D pool and reset.
+    .PARAMETER ClearData
+        With this parameter set to true, the disk will be reset and all data will be earsed.  The default is false.
+
     #>
     [CmdletBinding()]
     param(
