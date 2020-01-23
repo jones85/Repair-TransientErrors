@@ -39,7 +39,8 @@ function Repair-TransientErrors {
             ## Clear any data on the physical disk
             if ($ClearData -eq $True){
                 foreach ($disk in $disks){
-                    Reset-PhysicalDisk -FriendlyName $disk.UniqueId
+                    Reset-PhysicalDisk -FriendlyName $disk.FriendlyName
+                    Set-PhysicalDisk -UniqueId $disk.UniqueId -Usage AutoSelect
                 }
             }
             else {
@@ -47,15 +48,19 @@ function Repair-TransientErrors {
             }
 
             ## Add the disk back into the storage pool
-            Get-PhysicalDisk -CanPool $True | ForEach-Object {
-                Add-PhysicalDisk -StoragePoolFriendlyName $S2DStoragePool.FriendlyName -PhysicalDisks $PSItem
-            }
-            Get-PhysicalDisk | Where-Object {$_.BusType -ne "NVMe"} | Set-PhysicalDisk -Usage AutoSelect
-            Get-PhysicalDisk | Where-Object {$_.BusType -eq "NVMe"} | Set-PhysicalDisk -Usage Journal
-
-                
+            $FixedDisk = Get-PhysicalDisk -CanPool $True
+            if ($FixedDisk -ne $null){
+                Add-PhysicalDisk -StoragePoolFriendlyName $S2DStoragePool.FriendlyName -PhysicalDisks $FixedDisk.UniqueID
+                if ($FixedDisk.BusType -eq "NVMe"){
+                    Set-PhysicalDisk -UniqueId $FixedDisk.UniqueId -Usage Journal
+                }
+                else {
+                    Set-PhysicalDisk -UniqueId $FixedDisk.UniqueId -Usage AutoSelect
+                }
+            }                
         try {
-        } catch {
+        }
+        catch {
             Write-Error "$($_.Exception.Message) - Line Number: $($_.InvocationInfo.ScriptLineNumber)"
         }
     }
