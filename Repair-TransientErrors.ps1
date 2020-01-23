@@ -39,7 +39,7 @@ function Repair-TransientErrors {
             ## Clear any data on the physical disk
             if ($ClearData -eq $True){
                 foreach ($disk in $disks){
-                    Reset-PhysicalDisk -FriendlyName $disk.FriendlyName
+                    Reset-PhysicalDisk -FriendlyName $disk.UniqueId
                 }
             }
             else {
